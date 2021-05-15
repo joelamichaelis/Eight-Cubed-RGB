@@ -77,9 +77,11 @@ uint16_t current_lyr_on(uint16_t activeLyr);
 /* USER CODE BEGIN 0 */
 
 bool UPDATE_FRAME = 0;
+bool commandReceived = 0;
 
 //Indicates active cube layer, must be global so timer IRQ can access.
 uint8_t activeLyr = 0;
+uint8_t uartRxIndex = 0;
 
 //Data Arrays & Pointers shese should probably not be global
 // Data Arrays
@@ -172,26 +174,21 @@ int main(void)
 
 	
   /* USER CODE BEGIN 2 */
-
+	HAL_UART_Receive_IT(&huart1, &cliData.rawTextInput[uartRxIndex], 1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-		HAL_UART_Receive(&huart1, &cliData.rawTextInput[0], RAW_CLI_DATA_STR_LEN, UART_TIMEOUT);
-		
-		
-		cli_parse_data(cliDataPtr);
-		cli_interpret_data(cliDataPtr,framePtr);
-		cli_formulate_response(cliDataPtr);
-		
-		if(cliData.responseEnum != Null)
+		if(commandReceived==true)
 		{
-			HAL_UART_Transmit(&huart1, &cliData.responseStr[0], cliData.responseLen, UART_TIMEOUT);
+			cli_parse_data(cliDataPtr);
+			cli_interpret_data(cliDataPtr,framePtr);
+			cli_formulate_response(cliDataPtr);
+			if(cliData.responseEnum != Null) HAL_UART_Transmit(&huart1, &cliData.responseStr[0], cliData.responseLen, UART_TIMEOUT);
+			cli_data_cleanse(cliDataPtr); // resets everything except the rawTextInput
 		}
-		
-		cli_data_cleanse(cliDataPtr); // resets everything except the rawTextInput
 		HAL_Delay(10);
 	}
     /* USER CODE END WHILE */			
@@ -616,6 +613,18 @@ uint16_t current_lyr_on(uint16_t activeLyr)
 	activeLyr++;
 	if(activeLyr==8) activeLyr = 0;
 	return activeLyr;
+}
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	if(cliData.rawTextInput[uartRxIndex] == '\n') 
+	{
+		commandReceived = true;
+	}
+	
+	else uartRxIndex++;
+	
+	HAL_UART_Receive_IT(&huart1, &cliData.rawTextInput[uartRxIndex], 1);
 }
 
 /* USER CODE END 4 */
