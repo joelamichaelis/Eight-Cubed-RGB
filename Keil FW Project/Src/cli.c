@@ -130,11 +130,11 @@ bool cli_strcmp(char strVar[DEF_STR_LEN], char strConst[DEF_STR_LEN])
  * @param[in] tempStr: the input string to be converted 
  * @return the resulting integer  
  */
-uint8_t cli_str2int(char tempStr[DEF_STR_LEN])
+uint16_t cli_str2int(char tempStr[DEF_STR_LEN])
 {
 	char *tempStrPtr = &tempStr[0];
 	uint8_t tempIndex = 0;
-	uint8_t tempInt = 0;
+	uint16_t tempInt = 0;
 	
 	while(*(tempStrPtr + tempIndex) != 0x00)
 	{
@@ -195,10 +195,16 @@ void cli_formulate_response(cliData_TypeDef *cliDataPtr)
 		(*cliDataPtr).responseLen = 4;
 	}
 	
-	else if ((*cliDataPtr).responseEnum == Error) 
+	else if ((*cliDataPtr).responseEnum == ArgError) 
 	{
-		cli_strcpy(&(*cliDataPtr).responseStr[0],"Error\r\n");
-		(*cliDataPtr).responseLen = 7;
+		cli_strcpy(&(*cliDataPtr).responseStr[0],"Argument Error\r\n");
+		(*cliDataPtr).responseLen = 16;
+	}
+	
+	else if ((*cliDataPtr).responseEnum == InvalidCommand) 
+	{
+		cli_strcpy(&(*cliDataPtr).responseStr[0],"Invalid Command\r\n");
+		(*cliDataPtr).responseLen = 17;
 	}
 }
 
@@ -207,26 +213,37 @@ void cli_formulate_response(cliData_TypeDef *cliDataPtr)
  * @brief interprets the received cli command contained in cliData and modifies frame accordingly
  * @param[in] cliDataPtr - points to cliData struct which contains received command line interface commands, etc.
  * @param[in] frame - the struct which represets the LED cube and it's corresponding animation "frame" brightness values
+ * set_single_led_rgb lednum lyrnum redval grnval blueval
  */
 void cli_interpret_data(cliData_TypeDef *cliDataPtr, Frame_TypeDef *framePtr)
 {	
 	if(cli_strcmp((*cliDataPtr).command,"set_single_led_rgb") == true)
 	{
-		if((*cliDataPtr).numberOfArgs != 5) return;
+		if((*cliDataPtr).numberOfArgs != 5)
+		{
+			(*cliDataPtr).responseEnum = ArgError;
+			return;
+		}	
 		uint8_t ledNum = cli_str2int((*cliDataPtr).arg1);
 		uint8_t lyrNum = cli_str2int((*cliDataPtr).arg2);			
-		uint8_t redVal = cli_str2int((*cliDataPtr).arg3);
-		uint8_t grnVal = cli_str2int((*cliDataPtr).arg4);
-		uint8_t bluVal = cli_str2int((*cliDataPtr).arg5);
+		uint16_t redVal = cli_str2int((*cliDataPtr).arg3);
+		uint16_t grnVal = cli_str2int((*cliDataPtr).arg4);
+		uint16_t bluVal = cli_str2int((*cliDataPtr).arg5);
 		//cli_value_check(MAX_LED_NUM,MAX_LYR_NUM,MAX_BRIGHTNESS,MAX_BRIGHTNESS,MAX_BRIGHTNESS); //if values are exceeded, reports an arg value error.
 		uint64_t colorVal = cli_rgb2color(redVal,grnVal,bluVal);
 		frame_set_single_led_color(framePtr,lyrNum,colorVal,ledNum);
+		UPDATE_FRAME = true;
+		
 		(*cliDataPtr).responseEnum = OK;
 	}
 	
 	else if(cli_strcmp((*cliDataPtr).command,"set_single_led_color") == true)
 	{
-		if((*cliDataPtr).numberOfArgs != 3) return;
+		if((*cliDataPtr).numberOfArgs != 3)
+		{
+			(*cliDataPtr).responseEnum = ArgError;
+			return;
+		}	
 		uint8_t ledNum = cli_str2int((*cliDataPtr).arg1);
 		uint8_t lyrNum = cli_str2int((*cliDataPtr).arg2);
 		uint64_t colorVal = cli_str2int((*cliDataPtr).arg3); //this is definitely wrong
@@ -239,7 +256,11 @@ void cli_interpret_data(cliData_TypeDef *cliDataPtr, Frame_TypeDef *framePtr)
 	else if(cli_strcmp((*cliDataPtr).command,"color_definition") == true)
 	{
 		//color_definition colorname redval grnval bluval
-		if((*cliDataPtr).numberOfArgs != 4) return;
+		if((*cliDataPtr).numberOfArgs != 4)
+		{
+			(*cliDataPtr).responseEnum = ArgError;
+			return;
+		}	
 		uint8_t redVal = cli_str2int((*cliDataPtr).arg2);
 		uint8_t grnVal = cli_str2int((*cliDataPtr).arg3);
 		uint8_t bluVal = cli_str2int((*cliDataPtr).arg4);
@@ -251,7 +272,11 @@ void cli_interpret_data(cliData_TypeDef *cliDataPtr, Frame_TypeDef *framePtr)
 	else if(cli_strcmp((*cliDataPtr).command,"color_definition?") == true)
 	{
 		//color_definition?
-		if((*cliDataPtr).numberOfArgs != 0) return;
+		if((*cliDataPtr).numberOfArgs != 0)
+		{
+			(*cliDataPtr).responseEnum = ArgError;
+			return;
+		}	
 		//list color definitions
 		(*cliDataPtr).responseEnum = OK;
 	}	
@@ -260,7 +285,11 @@ void cli_interpret_data(cliData_TypeDef *cliDataPtr, Frame_TypeDef *framePtr)
 	{
 		//set_lyr_color lyrnum color boolmaskenc
 		
-		if((*cliDataPtr).numberOfArgs != 3) return;
+		if((*cliDataPtr).numberOfArgs != 3)
+		{
+			(*cliDataPtr).responseEnum = ArgError;
+			return;
+		}	
 		uint8_t lyrNum = cli_str2int((*cliDataPtr).arg1);
 		uint64_t color = cli_str2int((*cliDataPtr).arg2);
 		uint64_t boolMaskEnc = cli_str2int((*cliDataPtr).arg3);
@@ -275,7 +304,11 @@ void cli_interpret_data(cliData_TypeDef *cliDataPtr, Frame_TypeDef *framePtr)
 	else if(cli_strcmp((*cliDataPtr).command,"set_lyr_rgb") == true)
 	{
 		//set_lyr_rgb lyrnum boolmask redval grnval bluval
-		if((*cliDataPtr).numberOfArgs != 5) return;
+		if((*cliDataPtr).numberOfArgs != 5)
+		{
+			(*cliDataPtr).responseEnum = ArgError;
+			return;
+		}	
 		uint8_t lyrNum = cli_str2int((*cliDataPtr).arg1);
 		uint64_t boolMask = cli_str2int((*cliDataPtr).arg2);
 		//uint8_t redVal;
@@ -285,7 +318,7 @@ void cli_interpret_data(cliData_TypeDef *cliDataPtr, Frame_TypeDef *framePtr)
 	
 	else if(cli_strcmp((*cliDataPtr).command,"") != true)
 	{
-		(*cliDataPtr).responseEnum = Error;
+		(*cliDataPtr).responseEnum = InvalidCommand;
 	}
 	
 }

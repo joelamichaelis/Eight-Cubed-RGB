@@ -24,7 +24,7 @@
 #include "frame.h"
 #include "bool_mask.h"
 
-enum response{Null, OK, InvalidCommand, Error};  
+enum response{Null, OK, InvalidCommand, ArgError};  
 
 typedef struct __cliData_TypeDef
 {	

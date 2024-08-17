@@ -16,14 +16,14 @@
  */
 void frame_set_single_led_color(Frame_TypeDef *framePtr, uint8_t lyrNum, uint64_t colorVal, uint8_t ledNum)
 {
-	if(lyrNum == 0) lyr_frame_set_single_led_color((*framePtr).lyr0, colorVal, ledNum);
-	else if(lyrNum == 1) lyr_frame_set_single_led_color((*framePtr).lyr0, colorVal, ledNum);
-	else if(lyrNum == 2) lyr_frame_set_single_led_color((*framePtr).lyr0, colorVal, ledNum);
-	else if(lyrNum == 3) lyr_frame_set_single_led_color((*framePtr).lyr0, colorVal, ledNum);
-	else if(lyrNum == 4) lyr_frame_set_single_led_color((*framePtr).lyr0, colorVal, ledNum);
-	else if(lyrNum == 5) lyr_frame_set_single_led_color((*framePtr).lyr0, colorVal, ledNum);
-	else if(lyrNum == 6) lyr_frame_set_single_led_color((*framePtr).lyr0, colorVal, ledNum);
-	else if(lyrNum == 7) lyr_frame_set_single_led_color((*framePtr).lyr0, colorVal, ledNum);
+	if(lyrNum == 0) lyr_frame_set_single_led_color(framePtr->lyr0Ptr, colorVal, ledNum);
+	else if(lyrNum == 1) lyr_frame_set_single_led_color(framePtr->lyr1Ptr, colorVal, ledNum);
+	else if(lyrNum == 2) lyr_frame_set_single_led_color(framePtr->lyr2Ptr, colorVal, ledNum);
+	else if(lyrNum == 3) lyr_frame_set_single_led_color(framePtr->lyr3Ptr, colorVal, ledNum);
+	else if(lyrNum == 4) lyr_frame_set_single_led_color(framePtr->lyr4Ptr, colorVal, ledNum);
+	else if(lyrNum == 5) lyr_frame_set_single_led_color(framePtr->lyr5Ptr, colorVal, ledNum);
+	else if(lyrNum == 6) lyr_frame_set_single_led_color(framePtr->lyr6Ptr, colorVal, ledNum);
+	else if(lyrNum == 7) lyr_frame_set_single_led_color(framePtr->lyr7Ptr, colorVal, ledNum);
 }
  
 

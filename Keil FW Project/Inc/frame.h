@@ -20,6 +20,14 @@ typedef struct __Frame_TypeDef
 	LyrFrame_TypeDef lyr5;
 	LyrFrame_TypeDef lyr6;
 	LyrFrame_TypeDef lyr7;
+	LyrFrame_TypeDef *lyr0Ptr;
+	LyrFrame_TypeDef *lyr1Ptr;
+	LyrFrame_TypeDef *lyr2Ptr;
+	LyrFrame_TypeDef *lyr3Ptr;
+	LyrFrame_TypeDef *lyr4Ptr;
+	LyrFrame_TypeDef *lyr5Ptr;
+	LyrFrame_TypeDef *lyr6Ptr;
+	LyrFrame_TypeDef *lyr7Ptr;
 } Frame_TypeDef;
 
 

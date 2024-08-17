@@ -46,7 +46,7 @@ void lyr_frame_clear_all(LyrFrame_TypeDef lyrFrame);
  * @param[in] ledNum - a number of the a corresponding LED in the lyrframe
  * example usage: lyr_frame_set_single_led_color(frame1.lyr0,white,27);
  */
-void lyr_frame_set_single_led_color(LyrFrame_TypeDef lyrFrame, uint64_t color, uint8_t ledNum);
+void lyr_frame_set_single_led_color(LyrFrame_TypeDef *lyrFramePtr, uint64_t color, uint8_t ledNum);
 
 /**
  * @brief sets a single RGB array ptr withinin the layer frame to the specified mask
