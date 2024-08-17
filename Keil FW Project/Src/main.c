@@ -67,7 +67,6 @@ static void MX_SPI1_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_USART1_UART_Init(void);
-
 /* USER CODE BEGIN PFP */
 void previous_lyr_off(uint16_t activeLyr);
 uint16_t current_lyr_on(uint16_t activeLyr);
@@ -78,6 +77,7 @@ uint16_t current_lyr_on(uint16_t activeLyr);
 
 bool UPDATE_FRAME = 0;
 bool commandReceived = 0;
+bool initialLyrToggle = 1;
 
 //Indicates active cube layer, must be global so timer IRQ can access.
 uint8_t activeLyr = 0;
@@ -102,10 +102,13 @@ uint8_t uartTxBuffer[DEF_STR_LEN];
 uint8_t uartRxBuffer[RAW_CLI_DATA_STR_LEN];
 
 Frame_TypeDef frame;
-Frame_TypeDef *framePtr = &frame;
+Frame_TypeDef *framePtr;
+
+	
+	
 cliData_TypeDef cliData;
 cliData_TypeDef *cliDataPtr = &cliData;
-	
+		
 /* USER CODE END 0 */
 
 /**
@@ -142,39 +145,67 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM2_Init();
   MX_USART1_UART_Init();
-	
-		// This pin referencing is slightly redundant. L8 needs to be set since it's toggled during timXocstart (158)
-	HAL_GPIO_WritePin(L8_EN_GPIO_Port, L8_EN_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(L7_EN_GPIO_Port, L7_EN_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(L6_EN_GPIO_Port, L6_EN_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(L5_EN_GPIO_Port, L5_EN_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(L4_EN_GPIO_Port, L4_EN_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(L3_EN_GPIO_Port, L3_EN_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(L2_EN_GPIO_Port, L2_EN_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(L1_EN_GPIO_Port, L1_EN_Pin, GPIO_PIN_RESET);
+  /* USER CODE BEGIN 2 */
 	
 	
-	//HAL_TIM_OC_Start(&htim2, TIM_CHANNEL_2);	//
-	//HAL_TIM_Base_Start_IT(&htim1);
-	//HAL_TIM_OC_Start(&htim1, TIM_CHANNEL_4);	//this was working with ch1 even though thats set as a gpio!
+	HAL_TIM_OC_Start(&htim2, TIM_CHANNEL_2);	//
+	HAL_TIM_Base_Start_IT(&htim1);
+	HAL_TIM_OC_Start(&htim1, TIM_CHANNEL_4);	//this was working with ch1 even though thats set as a gpio!
+	HAL_SPI_Init(&hspi1);
+	tlc_clear(data16Ptr);
+	UPDATE_FRAME = 1;
 	
+	
+	//have to manually initialize pointers 
+	framePtr = &frame;
+	frame.lyr0Ptr = &frame.lyr0;
+	frame.lyr1Ptr = &frame.lyr1;
+	frame.lyr2Ptr = &frame.lyr2;
+	frame.lyr3Ptr = &frame.lyr3;
+	frame.lyr4Ptr = &frame.lyr4;
+	frame.lyr5Ptr = &frame.lyr5;
+	frame.lyr6Ptr = &frame.lyr6;
+	frame.lyr7Ptr = &frame.lyr7;
+	frame.lyr0.redArrPtr = &frame.lyr0.redArray[0];
+	frame.lyr0.grnArrPtr = &frame.lyr0.grnArray[0];
+	frame.lyr0.bluArrPtr = &frame.lyr0.bluArray[0];
+	frame.lyr1.redArrPtr = &frame.lyr1.redArray[0];
+	frame.lyr1.grnArrPtr = &frame.lyr1.grnArray[0];
+	frame.lyr1.bluArrPtr = &frame.lyr1.bluArray[0];
+	frame.lyr2.redArrPtr = &frame.lyr2.redArray[0];
+	frame.lyr2.grnArrPtr = &frame.lyr2.grnArray[0];
+	frame.lyr2.bluArrPtr = &frame.lyr2.bluArray[0];
+	frame.lyr3.redArrPtr = &frame.lyr3.redArray[0];
+	frame.lyr3.grnArrPtr = &frame.lyr3.grnArray[0];
+	frame.lyr3.bluArrPtr = &frame.lyr3.bluArray[0];
+	frame.lyr4.redArrPtr = &frame.lyr4.redArray[0];
+	frame.lyr4.grnArrPtr = &frame.lyr4.grnArray[0];
+	frame.lyr4.bluArrPtr = &frame.lyr4.bluArray[0];
+	frame.lyr5.redArrPtr = &frame.lyr5.redArray[0];
+	frame.lyr5.grnArrPtr = &frame.lyr5.grnArray[0];
+	frame.lyr5.bluArrPtr = &frame.lyr5.bluArray[0];
+	frame.lyr6.redArrPtr = &frame.lyr6.redArray[0];
+	frame.lyr6.grnArrPtr = &frame.lyr6.grnArray[0];
+	frame.lyr6.bluArrPtr = &frame.lyr6.bluArray[0];
+	frame.lyr7.redArrPtr = &frame.lyr7.redArray[0];
+	frame.lyr7.grnArrPtr = &frame.lyr7.grnArray[0];
+	frame.lyr7.bluArrPtr = &frame.lyr7.bluArray[0];
+	
+	HAL_UART_Receive_IT(&huart1, &cliData.rawTextInput[uartRxIndex], 1);
+	//frame_set_single_led_color(framePtr,0,0x0FFF0FFF0FFF,45);
+	for(uint8_t jk=0;jk<64;jk++)
+	{
+		lyr_frame_set_single_led_color(frame.lyr0Ptr, 0x0FFF0FFF0FFF, jk);
+	}
+	
+	UPDATE_FRAME = true;
+	HAL_Delay(1000);
 	
 	lcd20x4_i2c_init(&hi2c1);
 	lcd20x4_i2c_clear();
 	lcd20x4_i2c_1stLine();
 	lcd20x4_i2c_printf("8^3 RGB Begin!");
 	
-	
-	HAL_GPIO_WritePin(L8_EN_GPIO_Port, L8_EN_Pin, GPIO_PIN_SET);		
-	HAL_SPI_Init(&hspi1);
-
-	tlc_clear(data16Ptr);
-	UPDATE_FRAME = 1;
-	
-
-	
-  /* USER CODE BEGIN 2 */
-	HAL_UART_Receive_IT(&huart1, &cliData.rawTextInput[uartRxIndex], 1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -183,6 +214,7 @@ int main(void)
   {
 		if(commandReceived==true)
 		{
+			commandReceived = false;
 			cli_parse_data(cliDataPtr);
 			cli_interpret_data(cliDataPtr,framePtr);
 			cli_formulate_response(cliDataPtr);
@@ -191,9 +223,8 @@ int main(void)
 		}
 		HAL_Delay(10);
 	}
-    /* USER CODE END WHILE */			
+    /* USER CODE END WHILE */
 
-	
     /* USER CODE BEGIN 3 */
   /* USER CODE END 3 */
 }
@@ -560,6 +591,12 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {	
 	
+	if(initialLyrToggle == true)	//necessary because algorithm wasn't designed to handle inital condition where all lyrs are off
+	{	
+		initialLyrToggle = false;
+		previous_lyr_off(activeLyr);
+	}
+	
 	if(UPDATE_FRAME==0)
 	{
 		previous_lyr_off(activeLyr);
@@ -573,7 +610,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	if(UPDATE_FRAME==1)
 	{
 		previous_lyr_off(activeLyr);
-		//lyr_frame_convert(frame.lyr0,data16Ptr); previous usage
+		lyr_frame_convert(frame.lyr0,data16Ptr); //previous usage
 		//frame_convert(frame,activeLyr,data16Ptr);
 		tlc_spi_convert(data16Ptr, data8Ptr);
 		HAL_SPI_Transmit(&hspi1, data8Ptr, 24*NUM_TLCS, 10);
@@ -620,6 +657,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	if(cliData.rawTextInput[uartRxIndex] == '\n') 
 	{
 		commandReceived = true;
+		uartRxIndex = 0;
 	}
 	
 	else uartRxIndex++;

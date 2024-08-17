@@ -49,14 +49,15 @@ void lyr_frame_clear_all(LyrFrame_TypeDef lyrFrame)
  * @param[in] ledNum - a number of the a corresponding LED in the lyrframe
  * example usage: lyr_frame_set_single_led_color(frame1.lyr0,white,27);
  */
-void lyr_frame_set_single_led_color(LyrFrame_TypeDef lyrFrame, uint64_t color, uint8_t ledNum)
+void lyr_frame_set_single_led_color(LyrFrame_TypeDef *lyrFramePtr, uint64_t color, uint8_t ledNum)
 {
 	uint16_t redBrightness = (color>>32);
 	uint16_t grnBrightness = (color>>16);
 	uint16_t bluBrightness = (color>>0);
-	*(lyrFrame.redArrPtr + ledNum) = redBrightness;
-	*(lyrFrame.grnArrPtr + ledNum) = grnBrightness;
-	*(lyrFrame.bluArrPtr + ledNum) = bluBrightness;
+	lyrFramePtr->redArray[ledNum] = redBrightness;
+	lyrFramePtr->grnArray[ledNum] = grnBrightness;
+	lyrFramePtr->bluArray[ledNum] = bluBrightness;
+	// Is this another way to do it? *(lyrFramePtr->bluArrPtr + ledNum) = bluBrightness;
 }
 
 /**

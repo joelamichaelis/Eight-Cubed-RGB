@@ -1,8 +1,5 @@
 --cpu Cortex-M3
 "eight cubed rgb\startup_stm32f103xb.o"
-"eight cubed rgb\main.o"
-"eight cubed rgb\stm32f1xx_it.o"
-"eight cubed rgb\stm32f1xx_hal_msp.o"
 "eight cubed rgb\tlc5940.o"
 "eight cubed rgb\mpr121.o"
 "eight cubed rgb\cli.o"
@@ -11,6 +8,9 @@
 "eight cubed rgb\lyrframe.o"
 "eight cubed rgb\lcd20x4_i2c.o"
 "eight cubed rgb\bool_mask.o"
+"eight cubed rgb\main.o"
+"eight cubed rgb\stm32f1xx_it.o"
+"eight cubed rgb\stm32f1xx_hal_msp.o"
 "eight cubed rgb\stm32f1xx_hal_gpio_ex.o"
 "eight cubed rgb\stm32f1xx_hal_i2c.o"
 "eight cubed rgb\stm32f1xx_hal.o"
