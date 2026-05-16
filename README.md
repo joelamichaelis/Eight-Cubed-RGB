@@ -1,5 +1,9 @@
 # Custom 8x8x8 RGB LED Cube
 
+Check out the companion repo: https://github.com/joelamichaelis/8x8x8_RGB_LED_CUBE
+It appears that repo was made first.
+It appears that I made this repo to try and migrate away from that once since it has a lot of messy firmware builds.
+
 This repository contains my custom 8x8x8 RGB LED cube design/build, which I worked on from late 2018 through early 2020.
 This is primarily intended as an archived engineering showcase of the custom hardware, PCB, and firmware work rather than as a polished build guide.
 
