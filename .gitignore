@@ -1,1 +1,18 @@
-Local
+Local/
+
+# Keil MDK generated build output and per-user settings
+Keil FW Project/MDK-ARM/Eight Cubed RGB/
+Keil FW Project/MDK-ARM/*.uvguix.*
+Keil FW Project/MDK-ARM/*.uvoptx
+Keil FW Project/MDK-ARM/*.lst
+
+# Common Keil build artifacts
+*.axf
+*.build_log.htm
+*.crf
+*.d
+*.dep
+*.hex
+*.lnp
+*.map
+*.o
